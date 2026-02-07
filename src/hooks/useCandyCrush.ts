@@ -4,7 +4,7 @@ import { LEVELS, ANIM_SWAP, ANIM_REMOVE, ANIM_FALL, POINTS_BASE, POINTS_FOUR, PO
 import { createBoard, areAdjacent, swapInBoard, resetIdCounter } from '../game/board'
 import { findMatches, getMatchedPositions, determineSpecials, activateSpecials } from '../game/matcher'
 import { applyGravityAndFill, hasValidMoves, findHintMove } from '../game/gravity'
-import { playSwap, playMatch, playFail, playLevelUp, playSpecial } from '../utils/sound'
+import { playSwap, playMatch, playFail, playLevelUp, playSpecial, playSelect, playAreaBomb, playColorBomb, playGameOver, playLand, playCombo } from '../utils/sound'
 
 let _comboMsgId = 0
 
@@ -141,6 +141,7 @@ export function useCandyCrush(): CandyCrushState & CandyCrushActions & { readonl
         playLevelUp()
         setPhase('levelComplete')
       } else if (movesRef.current <= 0) {
+        playGameOver()
         setPhase('gameOver')
       } else if (!hasValidMoves(currentBoard)) {
         resetIdCounter()
@@ -161,11 +162,21 @@ export function useCandyCrush(): CandyCrushState & CandyCrushActions & { readonl
     if (currentCombo >= 1 && matches[0]) {
       const centerPos = matches[0].positions[Math.floor(matches[0].positions.length / 2)]
       spawnComboMessage(centerPos.row, centerPos.col, currentCombo)
+      playCombo(currentCombo)
     }
 
     // Find matched positions and activate specials
     let matched = getMatchedPositions(matches)
     matched = activateSpecials(currentBoard, matched)
+
+    // Detect activated specials in matched positions
+    for (const key of matched) {
+      const [r, c] = key.split(',').map(Number)
+      const candy = currentBoard[r]?.[c]
+      if (!candy?.special) continue
+      if (candy.special === 'area-bomb') playAreaBomb()
+      else if (candy.special === 'color-bomb') playColorBomb()
+    }
 
     const specials = determineSpecials(currentBoard, matches, swapPos)
     if (specials.length > 0) playSpecial()
@@ -189,6 +200,7 @@ export function useCandyCrush(): CandyCrushState & CandyCrushActions & { readonl
       setCombo(nextCombo)
 
       setTimeout(() => {
+        playLand(result.falls.length)
         setFalls([])
         setNewCandyIds(new Set())
         processRef.current(result.board, nextCombo)
@@ -231,6 +243,7 @@ export function useCandyCrush(): CandyCrushState & CandyCrushActions & { readonl
 
     // Clear hint when user interacts
     setHintPositions([])
+    playSelect()
 
     if (selected === null) {
       setSelected(pos)
