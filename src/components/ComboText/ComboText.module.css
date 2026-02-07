@@ -1,0 +1,39 @@
+.container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 20;
+}
+
+.combo {
+  position: absolute;
+  font-weight: 900;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.6),
+    0 2px 4px rgba(0, 0, 0, 0.4);
+  color: #fff;
+  animation: comboFloat 0.9s ease-out forwards;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes comboFloat {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.3);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2);
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -80%) scale(0.8);
+  }
+}

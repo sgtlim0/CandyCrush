@@ -13,8 +13,9 @@ export const CANDY_COLORS: readonly CandyColor[] = [
 ]
 
 export const ANIM_SWAP = 250
-export const ANIM_REMOVE = 200
-export const ANIM_FALL = 300
+export const ANIM_REMOVE = 250
+export const ANIM_FALL = 350
+export const HINT_DELAY = 3000
 
 export const POINTS_BASE = 10
 export const POINTS_FOUR = 30
@@ -34,6 +35,15 @@ export const LEVELS: readonly LevelConfig[] = [
   { level: 10, targetScore: 25000, moves: 15 },
 ]
 
+export const CANDY_EMOJI: Record<CandyColor, string> = {
+  red: '🍓',
+  orange: '🍊',
+  yellow: '🍋',
+  green: '🍏',
+  blue: '🫐',
+  purple: '🍇',
+}
+
 export const COLOR_MAP: Record<CandyColor, { light: string; dark: string }> = {
   red: { light: '#ff6b6b', dark: '#c0392b' },
   orange: { light: '#ffa726', dark: '#e67e22' },
@@ -42,3 +52,12 @@ export const COLOR_MAP: Record<CandyColor, { light: string; dark: string }> = {
   blue: { light: '#42a5f5', dark: '#1565c0' },
   purple: { light: '#ab47bc', dark: '#7b1fa2' },
 }
+
+export const COMBO_MESSAGES: readonly string[] = [
+  'Sweet!',
+  'Tasty!',
+  'Delicious!',
+  'Sugar Rush!',
+  'Divine!',
+  'Incredible!',
+]

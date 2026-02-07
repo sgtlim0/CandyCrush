@@ -1,6 +1,6 @@
 export type CandyColor = 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'purple'
 
-export type SpecialType = 'striped-h' | 'striped-v' | 'color-bomb'
+export type SpecialType = 'striped-h' | 'striped-v' | 'area-bomb' | 'color-bomb'
 
 export type GamePhase =
   | 'start'
@@ -38,4 +38,18 @@ export interface LevelConfig {
   readonly level: number
   readonly targetScore: number
   readonly moves: number
+}
+
+export interface ComboMessage {
+  readonly id: number
+  readonly text: string
+  readonly row: number
+  readonly col: number
+}
+
+export interface ParticleGroup {
+  readonly id: number
+  readonly row: number
+  readonly col: number
+  readonly color: CandyColor
 }

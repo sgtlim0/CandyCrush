@@ -1,7 +1,9 @@
 import { useCallback, useRef } from 'react'
-import type { Board as BoardType, Position, FallInfo } from '../../game/types'
+import type { Board as BoardType, Position, FallInfo, ComboMessage, ParticleGroup } from '../../game/types'
 import { ROWS, COLS } from '../../game/constants'
 import { CandyCell } from '../CandyCell/CandyCell'
+import { ComboText } from '../ComboText/ComboText'
+import { Particles } from '../Particles/Particles'
 import styles from './Board.module.css'
 
 interface BoardProps {
@@ -10,6 +12,9 @@ interface BoardProps {
   readonly matchedKeys: ReadonlySet<string>
   readonly falls: readonly FallInfo[]
   readonly newCandyIds: ReadonlySet<number>
+  readonly hintPositions: readonly Position[]
+  readonly comboMessages: readonly ComboMessage[]
+  readonly particles: readonly ParticleGroup[]
   readonly onSelect: (pos: Position) => void
   readonly disabled: boolean
 }
@@ -20,6 +25,9 @@ export function Board({
   matchedKeys,
   falls,
   newCandyIds,
+  hintPositions,
+  comboMessages,
+  particles,
   onSelect,
   disabled,
 }: BoardProps) {
@@ -29,6 +37,11 @@ export function Board({
   const fallMap = new Map<number, FallInfo>()
   for (const f of falls) {
     fallMap.set(f.candyId, f)
+  }
+
+  const hintSet = new Set<string>()
+  for (const hp of hintPositions) {
+    hintSet.add(`${hp.row},${hp.col}`)
   }
 
   const handleTouchStart = useCallback(
@@ -60,10 +73,8 @@ export function Board({
       const dist = Math.sqrt(dx * dx + dy * dy)
 
       if (dist < 15) {
-        // Tap - select
         onSelect(start.pos)
       } else {
-        // Swipe - determine direction
         let targetPos: Position
         if (Math.abs(dx) > Math.abs(dy)) {
           targetPos = { row: start.pos.row, col: start.pos.col + (dx > 0 ? 1 : -1) }
@@ -72,9 +83,7 @@ export function Board({
         }
 
         if (targetPos.row >= 0 && targetPos.row < ROWS && targetPos.col >= 0 && targetPos.col < COLS) {
-          // Select first candy, then the target
           onSelect(start.pos)
-          // Small delay to allow the selection to register
           setTimeout(() => onSelect(targetPos), 10)
         }
       }
@@ -109,6 +118,7 @@ export function Board({
         selected !== null && selected.row === row && selected.col === col
       const isMatched = matchedKeys.has(`${row},${col}`)
       const isNew = newCandyIds.has(candy.id)
+      const isHint = hintSet.has(`${row},${col}`)
       const fi = fallMap.get(candy.id)
 
       candies.push(
@@ -120,6 +130,7 @@ export function Board({
           isSelected={isSelected}
           isMatched={isMatched}
           isNew={isNew}
+          isHint={isHint}
           fallInfo={fi}
           onClick={() => !disabled && onSelect({ row, col })}
         />,
@@ -136,6 +147,8 @@ export function Board({
     >
       {gridCells}
       {candies}
+      <Particles groups={particles} />
+      <ComboText messages={comboMessages} />
     </div>
   )
 }

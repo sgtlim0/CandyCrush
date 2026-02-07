@@ -1,0 +1,46 @@
+.container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 15;
+}
+
+.group {
+  position: absolute;
+  width: 12.5%;
+  height: 12.5%;
+}
+
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  animation: burst 0.6s ease-out forwards;
+}
+
+.particle:nth-child(1) { --dx: -12px; --dy: -14px; }
+.particle:nth-child(2) { --dx: 12px; --dy: -14px; }
+.particle:nth-child(3) { --dx: -16px; --dy: 4px; }
+.particle:nth-child(4) { --dx: 16px; --dy: 4px; }
+.particle:nth-child(5) { --dx: -6px; --dy: 16px; }
+.particle:nth-child(6) { --dx: 6px; --dy: 16px; }
+.particle:nth-child(7) { --dx: 0px; --dy: -18px; }
+.particle:nth-child(8) { --dx: 0px; --dy: 18px; }
+
+@keyframes burst {
+  0% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(
+      calc(-50% + var(--dx, 0px)),
+      calc(-50% + var(--dy, 0px))
+    ) scale(0);
+    opacity: 0;
+  }
+}

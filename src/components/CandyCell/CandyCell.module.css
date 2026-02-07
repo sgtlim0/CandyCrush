@@ -6,11 +6,12 @@
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   box-shadow:
-    inset 2px 2px 6px rgba(255, 255, 255, 0.35),
-    inset -2px -2px 4px rgba(0, 0, 0, 0.2),
-    0 2px 6px rgba(0, 0, 0, 0.3);
+    0 2px 8px rgba(0, 0, 0, 0.25);
   -webkit-tap-highlight-color: transparent;
   z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .candy:hover {
@@ -22,15 +23,25 @@
   transform: scale(0.95);
 }
 
+.emoji {
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  line-height: 1;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
 .selected {
   transform: scale(1.1);
   box-shadow:
-    inset 2px 2px 6px rgba(255, 255, 255, 0.35),
-    inset -2px -2px 4px rgba(0, 0, 0, 0.2),
     0 0 0 3px rgba(255, 255, 255, 0.8),
     0 0 16px rgba(255, 255, 255, 0.4);
   z-index: 3;
   animation: bounce 0.5s ease infinite;
+}
+
+.hint {
+  animation: hintPulse 1s ease-in-out infinite;
+  z-index: 2;
 }
 
 .matched {
@@ -63,8 +74,8 @@
     0deg,
     transparent,
     transparent 3px,
-    rgba(255, 255, 255, 0.3) 3px,
-    rgba(255, 255, 255, 0.3) 5px
+    rgba(255, 255, 255, 0.35) 3px,
+    rgba(255, 255, 255, 0.35) 5px
   );
 }
 
@@ -76,30 +87,47 @@
     90deg,
     transparent,
     transparent 3px,
-    rgba(255, 255, 255, 0.3) 3px,
-    rgba(255, 255, 255, 0.3) 5px
+    rgba(255, 255, 255, 0.35) 3px,
+    rgba(255, 255, 255, 0.35) 5px
   );
 }
 
+.stripedH .emoji,
+.stripedV .emoji {
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+}
+
+/* Area bomb */
+.areaBomb {
+  animation: areaPulse 1.2s ease-in-out infinite;
+}
+
+.bombRing {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+  animation: ringRotate 3s linear infinite;
+}
+
+/* Color bomb */
 .colorBomb {
   animation: rainbowSpin 2s linear infinite;
 }
 
-.bombStar {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4em;
-  color: rgba(255, 255, 255, 0.9);
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-  pointer-events: none;
+.colorBomb .emoji {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
 }
 
 @keyframes bounce {
   0%, 100% { transform: scale(1.1); }
   50% { transform: scale(1.15); }
+}
+
+@keyframes hintPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+  50% { transform: scale(1.06); box-shadow: 0 0 12px 4px rgba(255, 215, 0, 0.4); }
 }
 
 @keyframes candyFall {
@@ -114,6 +142,15 @@
     transform: translateY(0);
     opacity: 1;
   }
+}
+
+@keyframes areaPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  50% { box-shadow: 0 0 10px 3px rgba(255, 255, 255, 0.3); }
+}
+
+@keyframes ringRotate {
+  to { transform: rotate(360deg); }
 }
 
 @keyframes rainbowSpin {

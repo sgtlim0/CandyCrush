@@ -33,13 +33,21 @@
 
 .star {
   font-size: 2.5rem;
-  color: #fbbf24;
   text-shadow: 0 0 16px rgba(251, 191, 36, 0.5);
   animation: starPop 0.5s ease backwards;
 }
 
 .starBig {
   font-size: 3.2rem;
+}
+
+.starActive {
+  color: #fbbf24;
+}
+
+.starInactive {
+  color: rgba(255, 255, 255, 0.15);
+  text-shadow: none;
 }
 
 .title {

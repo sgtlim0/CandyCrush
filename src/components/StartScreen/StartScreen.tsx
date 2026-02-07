@@ -1,3 +1,4 @@
+import { CANDY_EMOJI, CANDY_COLORS } from '../../game/constants'
 import styles from './StartScreen.module.css'
 
 interface StartScreenProps {
@@ -9,18 +10,15 @@ export function StartScreen({ onStart }: StartScreenProps) {
     <div className={styles.container}>
       <div className={styles.hero}>
         <div className={styles.candies}>
-          {['#ff6b6b', '#ffa726', '#ffee58', '#66bb6a', '#42a5f5', '#ab47bc'].map(
-            (color, i) => (
-              <div
-                key={i}
-                className={styles.floatingCandy}
-                style={{
-                  background: `radial-gradient(circle at 35% 30%, ${color}, ${color}88)`,
-                  animationDelay: `${i * 0.15}s`,
-                }}
-              />
-            ),
-          )}
+          {CANDY_COLORS.map((color, i) => (
+            <div
+              key={color}
+              className={styles.floatingCandy}
+              style={{ animationDelay: `${i * 0.15}s` }}
+            >
+              {CANDY_EMOJI[color]}
+            </div>
+          ))}
         </div>
         <h1 className={styles.title}>CANDY CRUSH</h1>
         <p className={styles.subtitle}>Match 3 Puzzle Game</p>
@@ -29,19 +27,19 @@ export function StartScreen({ onStart }: StartScreenProps) {
       <div className={styles.rules}>
         <div className={styles.rule}>
           <span className={styles.ruleIcon}>&#x1F447;</span>
-          <p>인접한 캔디를 스와이프하거나 탭하여 교환</p>
+          <p>Swipe or tap adjacent candies to swap</p>
         </div>
         <div className={styles.rule}>
           <span className={styles.ruleIcon}>&#x2728;</span>
-          <p>같은 색 캔디 3개 이상을 일렬로 매치</p>
+          <p>Match 3+ same candies in a line</p>
         </div>
         <div className={styles.rule}>
           <span className={styles.ruleIcon}>&#x1F31F;</span>
-          <p>4개 매치 = 줄무늬, 5개 매치 = 컬러 폭탄</p>
+          <p>4-match = Striped, T/L = Bomb, 5 = Rainbow</p>
         </div>
         <div className={styles.rule}>
           <span className={styles.ruleIcon}>&#x1F3AF;</span>
-          <p>제한된 이동 횟수 안에 목표 점수 달성!</p>
+          <p>Reach the target score within limited moves!</p>
         </div>
       </div>
 

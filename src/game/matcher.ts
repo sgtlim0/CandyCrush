@@ -5,11 +5,10 @@ import { posKey, nextId } from './board'
 export function findMatches(board: Board): readonly Match[] {
   const matches: Match[] = []
 
-  // Horizontal matches
   for (let row = 0; row < ROWS; row++) {
     let start = 0
     for (let col = 1; col <= COLS; col++) {
-      const current = board[row][col]
+      const current = board[row][col] ?? null
       const startCandy = board[row][start]
       if (
         col < COLS &&
@@ -19,8 +18,7 @@ export function findMatches(board: Board): readonly Match[] {
       ) {
         continue
       }
-      const length = col - start
-      if (length >= 3 && startCandy !== null) {
+      if (col - start >= 3 && startCandy !== null) {
         const positions: Position[] = []
         for (let c = start; c < col; c++) {
           positions.push({ row, col: c })
@@ -31,7 +29,6 @@ export function findMatches(board: Board): readonly Match[] {
     }
   }
 
-  // Vertical matches
   for (let col = 0; col < COLS; col++) {
     let start = 0
     for (let row = 1; row <= ROWS; row++) {
@@ -45,8 +42,7 @@ export function findMatches(board: Board): readonly Match[] {
       ) {
         continue
       }
-      const length = row - start
-      if (length >= 3 && startCandy !== null) {
+      if (row - start >= 3 && startCandy !== null) {
         const positions: Position[] = []
         for (let r = start; r < row; r++) {
           positions.push({ row: r, col })
@@ -72,6 +68,30 @@ export function getMatchedPositions(
   return set
 }
 
+function isHorizontalMatch(match: Match): boolean {
+  return match.positions.length >= 2 && match.positions[0].row === match.positions[1].row
+}
+
+function findCrossPoints(matches: readonly Match[]): ReadonlySet<string> {
+  const hPositions = new Set<string>()
+  const vPositions = new Set<string>()
+
+  for (const match of matches) {
+    const isH = isHorizontalMatch(match)
+    for (const pos of match.positions) {
+      const key = posKey(pos.row, pos.col)
+      if (isH) hPositions.add(key)
+      else vPositions.add(key)
+    }
+  }
+
+  const crossPoints = new Set<string>()
+  for (const key of hPositions) {
+    if (vPositions.has(key)) crossPoints.add(key)
+  }
+  return crossPoints
+}
+
 interface SpecialCreation {
   readonly row: number
   readonly col: number
@@ -85,13 +105,31 @@ export function determineSpecials(
 ): readonly SpecialCreation[] {
   const specials: SpecialCreation[] = []
   const usedPositions = new Set<string>()
+  const crossPoints = findCrossPoints(matches)
+
+  // Handle cross/T/L shapes first → area bomb
+  for (const key of crossPoints) {
+    if (usedPositions.has(key)) continue
+    const [r, c] = key.split(',').map(Number)
+    const candy = board[r][c]
+    if (!candy) continue
+
+    usedPositions.add(key)
+    specials.push({
+      row: r,
+      col: c,
+      candy: { id: nextId(), color: candy.color, special: 'area-bomb' },
+    })
+  }
 
   for (const match of matches) {
     const len = match.positions.length
-
     if (len < 4) continue
 
-    // Find best position for special (prefer swap position if in match)
+    // Skip if any position already used for a cross special
+    const hasUsed = match.positions.some((p) => usedPositions.has(posKey(p.row, p.col)))
+    if (hasUsed) continue
+
     let specialPos = match.positions[Math.floor(len / 2)]
     if (swapPos) {
       const inMatch = match.positions.find(
@@ -111,20 +149,14 @@ export function determineSpecials(
     if (len >= 5) {
       special = 'color-bomb'
     } else {
-      // Determine orientation
-      const isHorizontal =
-        match.positions[0].row === match.positions[1].row
-      special = isHorizontal ? 'striped-h' : 'striped-v'
+      const isH = isHorizontalMatch(match)
+      special = isH ? 'striped-h' : 'striped-v'
     }
 
     specials.push({
       row: specialPos.row,
       col: specialPos.col,
-      candy: {
-        id: nextId(),
-        color: candy.color,
-        special,
-      },
+      candy: { id: nextId(), color: candy.color, special },
     })
   }
 
@@ -143,24 +175,26 @@ export function activateSpecials(
     if (!candy?.special) continue
 
     if (candy.special === 'striped-h') {
-      for (let col = 0; col < COLS; col++) {
-        extra.add(posKey(r, col))
-      }
+      for (let col = 0; col < COLS; col++) extra.add(posKey(r, col))
     } else if (candy.special === 'striped-v') {
-      for (let row = 0; row < ROWS; row++) {
-        extra.add(posKey(row, c))
+      for (let row = 0; row < ROWS; row++) extra.add(posKey(row, c))
+    } else if (candy.special === 'area-bomb') {
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          const nr = r + dr
+          const nc = c + dc
+          if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+            extra.add(posKey(nr, nc))
+          }
+        }
       }
     } else if (candy.special === 'color-bomb') {
-      // Remove all candies of the most common color in matched set
       const colorCounts = new Map<string, number>()
       for (const mk of matchedPositions) {
         const [mr, mc] = mk.split(',').map(Number)
         const mc2 = board[mr]?.[mc]
         if (mc2 && mc2.id !== candy.id) {
-          colorCounts.set(
-            mc2.color,
-            (colorCounts.get(mc2.color) ?? 0) + 1,
-          )
+          colorCounts.set(mc2.color, (colorCounts.get(mc2.color) ?? 0) + 1)
         }
       }
       let targetColor: string = candy.color

@@ -36,6 +36,9 @@ export default function App() {
           matchedKeys={game.matchedKeys}
           falls={game.falls}
           newCandyIds={game.newCandyIds}
+          hintPositions={game.hintPositions}
+          comboMessages={game.comboMessages}
+          particles={game.particles}
           onSelect={game.selectCandy}
           disabled={isBusy}
         />
@@ -45,6 +48,7 @@ export default function App() {
         <LevelComplete
           level={game.level}
           score={game.score}
+          stars={game.stars}
           onNext={game.nextLevel}
           onMenu={game.resetGame}
         />
