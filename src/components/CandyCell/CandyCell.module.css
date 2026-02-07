@@ -1,0 +1,121 @@
+.candy {
+  position: absolute;
+  width: calc(12.5% - 4px);
+  height: calc(12.5% - 4px);
+  border-radius: 22%;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow:
+    inset 2px 2px 6px rgba(255, 255, 255, 0.35),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  -webkit-tap-highlight-color: transparent;
+  z-index: 1;
+}
+
+.candy:hover {
+  transform: scale(1.08);
+  z-index: 2;
+}
+
+.candy:active {
+  transform: scale(0.95);
+}
+
+.selected {
+  transform: scale(1.1);
+  box-shadow:
+    inset 2px 2px 6px rgba(255, 255, 255, 0.35),
+    inset -2px -2px 4px rgba(0, 0, 0, 0.2),
+    0 0 0 3px rgba(255, 255, 255, 0.8),
+    0 0 16px rgba(255, 255, 255, 0.4);
+  z-index: 3;
+  animation: bounce 0.5s ease infinite;
+}
+
+.matched {
+  transform: scale(0);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.falling {
+  animation: candyFall var(--fall-duration, 300ms) ease forwards;
+}
+
+/* Striped candy overlays */
+.stripeOverlayH,
+.stripeOverlayV {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.stripeOverlayH::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.3) 3px,
+    rgba(255, 255, 255, 0.3) 5px
+  );
+}
+
+.stripeOverlayV::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.3) 3px,
+    rgba(255, 255, 255, 0.3) 5px
+  );
+}
+
+.colorBomb {
+  animation: rainbowSpin 2s linear infinite;
+}
+
+.bombStar {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4em;
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  pointer-events: none;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: scale(1.1); }
+  50% { transform: scale(1.15); }
+}
+
+@keyframes candyFall {
+  from {
+    transform: translateY(calc(var(--fall-distance, 0%) * -1));
+    opacity: 0.6;
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes rainbowSpin {
+  to { filter: hue-rotate(360deg); }
+}
